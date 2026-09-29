@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-blush-50 text-ink dark:bg-[#1d1519] dark:text-[#f3e8ec];
+  }
+  h1, h2, h3 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-3xl border border-blush-200/70 bg-white p-5 shadow-[0_2px_16px_rgba(168,86,110,0.07)] dark:border-white/10 dark:bg-[#251b20] dark:shadow-none;
+  }
+  .card-soft {
+    @apply rounded-3xl border border-blush-200/60 bg-blush-100/60 p-5 dark:border-white/10 dark:bg-white/5;
+  }
+  .btn-primary {
+    @apply rounded-full bg-rosey px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-rosey-dark active:scale-[0.98];
+  }
+  .btn-ghost {
+    @apply rounded-full border border-blush-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-blush-100 active:scale-[0.98] dark:border-white/10 dark:bg-[#251b20] dark:text-neutral-200 dark:hover:bg-white/10;
+  }
+  .btn-pill {
+    @apply inline-flex items-center gap-2 rounded-full bg-blush-200/80 px-5 py-2.5 text-sm font-semibold text-rosey-dark transition hover:bg-blush-200 active:scale-[0.98] dark:bg-rosey/20 dark:text-rosey-soft;
+  }
+  .input {
+    @apply w-full rounded-2xl border border-blush-200 bg-white px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-neutral-400 focus:border-rosey focus:ring-2 focus:ring-rosey/20 dark:border-white/10 dark:bg-[#1d1519] dark:text-[#f3e8ec];
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400;
+  }
+  .eyebrow {
+    @apply text-[11px] font-bold uppercase tracking-[0.22em] text-rosey/80 dark:text-rosey-soft/80;
+  }
+  .page-title {
+    @apply font-display text-2xl text-ink dark:text-[#f3e8ec] sm:text-3xl;
+  }
+  .page-sub {
+    @apply mt-1 text-sm text-neutral-500 dark:text-neutral-400;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full bg-blush-200 px-3 py-1 text-xs font-semibold text-rosey-dark dark:bg-rosey/20 dark:text-rosey-soft;
+  }
+  .hero-num {
+    @apply pointer-events-none absolute -right-2 top-1/2 -translate-y-1/2 select-none font-display text-[9rem] leading-none text-blush-200/70 dark:text-white/5 sm:text-[11rem];
+  }
+}
