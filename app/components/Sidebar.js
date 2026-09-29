@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLayoutEffect, useRef, useState } from 'react';
 import ThemeToggle from './ThemeToggle';
+import Logo from './Logo';
 
 function Icon({ d, extra }) {
   return (
@@ -185,9 +186,10 @@ function NavItems({ onNavigate, pill }) {
 
 export function Sidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-blush-200/70 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-[#221820]/90 lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-blush-200/70 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-[#12263c]/90 lg:flex">
       <div className="px-6 pb-2 pt-8">
-        <p className="eyebrow">Study Desk</p>
+        <Logo size={34} />
+        <p className="eyebrow mt-2">Study Desk</p>
       </div>
       <nav className="relative flex flex-1 flex-col gap-1 px-4 py-4">
         <NavItems />
@@ -204,9 +206,12 @@ export function Sidebar() {
 
 export function MobileBar() {
   return (
-    <div className="sticky top-0 z-40 border-b border-blush-200/70 bg-blush-50/90 backdrop-blur-md dark:border-white/10 dark:bg-[#1d1519]/90 lg:hidden">
+    <div className="sticky top-0 z-40 border-b border-blush-200/70 bg-blush-50/90 backdrop-blur-md dark:border-white/10 dark:bg-[#0e1e30]/90 lg:hidden">
       <div className="flex items-center justify-between px-4 pt-4">
-        <p className="eyebrow">Study Desk</p>
+        <div>
+          <Logo size={28} />
+          <p className="eyebrow mt-1.5">Study Desk</p>
+        </div>
         <ThemeToggle compact />
       </div>
       <nav data-no-swipe className="relative flex gap-2 overflow-x-auto px-4 py-3">

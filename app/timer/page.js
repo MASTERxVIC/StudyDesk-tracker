@@ -514,7 +514,7 @@ export default function TimerPage() {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <div
-              className="font-extralight tabular-nums text-ink dark:text-[#f3e8ec]"
+              className="font-extralight tabular-nums text-ink dark:text-[#e8f2fa]"
               style={{
                 fontSize: 56,
                 letterSpacing: -2,

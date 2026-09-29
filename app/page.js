@@ -106,7 +106,7 @@ export default function TodayPage() {
         </span>
         <div className="relative">
           <p className="eyebrow">{dateEyebrow}</p>
-          <h1 className="mt-3 max-w-md font-display text-5xl leading-[1.05] text-ink dark:text-[#f3e8ec] sm:text-6xl">
+          <h1 className="mt-3 max-w-md font-display text-5xl leading-[1.05] text-ink dark:text-[#e8f2fa] sm:text-6xl">
             Today, show the work.
           </h1>
           <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-neutral-500 dark:text-neutral-400">
@@ -123,7 +123,7 @@ export default function TodayPage() {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="eyebrow">Since Day 1</p>
-            <h2 className="mt-2 font-display text-3xl text-ink dark:text-[#f3e8ec]">
+            <h2 className="mt-2 font-display text-3xl text-ink dark:text-[#e8f2fa]">
               Momentum, at a glance
             </h2>
           </div>
@@ -134,19 +134,19 @@ export default function TodayPage() {
 
         <div className="card mt-4 grid grid-cols-3 divide-x divide-blush-200/70 !p-0 dark:divide-white/10">
           <div className="p-5 sm:p-6">
-            <p className="font-display text-3xl text-ink dark:text-[#f3e8ec] sm:text-4xl">
+            <p className="font-display text-3xl text-ink dark:text-[#e8f2fa] sm:text-4xl">
               {weekHours.toFixed(1)}h
             </p>
             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Study time</p>
           </div>
           <div className="p-5 sm:p-6">
-            <p className="font-display text-3xl text-ink dark:text-[#f3e8ec] sm:text-4xl">
+            <p className="font-display text-3xl text-ink dark:text-[#e8f2fa] sm:text-4xl">
               {daysLogged}
             </p>
             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Days logged</p>
           </div>
           <div className="p-5 sm:p-6">
-            <p className="font-display text-3xl text-ink dark:text-[#f3e8ec] sm:text-4xl">
+            <p className="font-display text-3xl text-ink dark:text-[#e8f2fa] sm:text-4xl">
               {doneTopics}/{topics.length || TOTAL_TOPICS}
             </p>
             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Topics complete</p>

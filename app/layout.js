@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata = {
   title: 'Study Desk — Bank Exam Prep Tracker',
-  description: 'Dusty-rose, Apple-minimal study tracker for IBPS / SBI / RRB bank exams.',
+  description: 'Sky-blue, Apple-minimal study tracker for IBPS / SBI / RRB bank exams.',
 };
 
 export default function RootLayout({ children }) {

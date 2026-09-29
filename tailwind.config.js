@@ -8,20 +8,21 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Sky-blue theme (token names blush/rosey kept — saare pages auto-convert)
         blush: {
-          50: '#faf4f6', // page background — pale dusty rose
-          100: '#f6e9ee',
-          200: '#f0dbe3', // soft pink pill / surfaces
-          300: '#e3c2cd',
-          400: '#c99bab',
-          500: '#b98a9c',
+          50: '#eef7fd', // page background — pale sky mist
+          100: '#dff0fa',
+          200: '#c9e8f9', // soft blue pill / surfaces
+          300: '#9cd3f0',
+          400: '#6fc3ee',
+          500: '#4aa8dc',
         },
         rosey: {
-          DEFAULT: '#a8566e', // muted dusty-rose accent
-          dark: '#8f4660',
-          soft: '#c08095',
+          DEFAULT: '#1b9bd8', // sky-blue accent
+          dark: '#0e7cb8',
+          soft: '#6fc3ee',
         },
-        ink: '#2b2327', // warm near-black text
+        ink: '#123a5c', // deep navy text
       },
       fontFamily: {
         display: ['var(--font-righteous)', 'cursive'],
