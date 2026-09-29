@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { IconBook, IconX } from '../components/icons';
 import { cachedGet, bust } from '../lib/fetchCache';
 import { getDayPlan, getPlanWeek, fmtDayShort } from '../lib/studyPlan';
@@ -15,6 +15,23 @@ const STATUS = [
 
 function TimetableCard() {
   const [planDate, setPlanDate] = useState(() => new Date());
+  const stripRef = useRef(null);
+  const firstPaint = useRef(true);
+  // Patti hamesha selected din ko dikhaye: pehli baar "aaj" left edge pe (instant),
+  // uske baad (pill tap / See tomorrow) selected din smooth scroll se view me aaye.
+  useEffect(() => {
+    const box = stripRef.current;
+    if (!box) return;
+    const selBtn = box.querySelector('[data-sel="1"]');
+    if (selBtn) {
+      selBtn.scrollIntoView({
+        behavior: firstPaint.current ? 'auto' : 'smooth',
+        inline: firstPaint.current ? 'start' : 'nearest',
+        block: 'nearest',
+      });
+    }
+    firstPaint.current = false;
+  }, [planDate]);
   const plan = getDayPlan(planDate);
   const weekDays = getPlanWeek(planDate);
   const todayStr = new Date().toDateString();
@@ -29,13 +46,14 @@ function TimetableCard() {
       <p className="eyebrow">Day-wise plan</p>
       <h2 className="page-title mt-2">Study timetable</h2>
 
-      <div className="mt-4 flex gap-2 overflow-x-auto px-1 py-1" data-no-swipe>
+      <div ref={stripRef} className="mt-4 flex gap-2 overflow-x-auto px-1 py-1" data-no-swipe>
         {weekDays.map(({ date, dayNumber }) => {
           const sel = planDate.toDateString() === date.toDateString();
           const isToday = todayStr === date.toDateString();
           return (
             <button
               key={dayNumber}
+              data-sel={sel ? '1' : '0'}
               onClick={() => setPlanDate(date)}
               className={`flex shrink-0 flex-col items-center rounded-xl px-3 py-2 text-xs font-semibold transition ${
                 sel
