@@ -281,28 +281,18 @@ export default function TimerPage() {
     };
   };
 
-  const computeStudyMs = () => {
-    const s = readSessionFresh();
-    if (!s.anchor) return 0;
-    const end = Date.now();
-    let ms = end - s.anchor - s.pausedTotal;
-    if (s.pauseStart > 0) ms -= end - s.pauseStart; // abhi pause me hai to wahan tak kaata
-    // Break/Lunch ka time padhai me count nahi hoga — sirf study slots ka time
-    for (const sl of slots) {
-      if (!isBreakSlot(sl.title)) continue;
-      ms -= Math.max(0, Math.min(sl.end, end) - Math.max(sl.start, s.anchor));
-    }
-    return Math.max(0, ms);
-  };
 
   // End session → Daily Log page kholo; entry user khud karega (koi auto-save nahi).
-  // Timer ke calculated hours suggestion ke taur pe pre-filled milenge, baaki sab blank.
+  // Timer display wala exact elapsed suggestion ke taur pe pre-filled milega, baaki sab blank.
   const onEnd = () => {
     if (!confirm('End today\u2019s session?')) return;
     setBusy(true);
     try {
-      const ms = computeStudyMs(); // End se PEHLE calculate karo
-      const hours = Math.round((ms / 3600000) * 2) / 2;
+      const s = readSessionFresh();
+      const endMs = paused && s.pauseStart > 0 ? s.pauseStart : Date.now();
+      // WYSIWYG: display wala elapsed (session start se) — koi kaat-chaant nahi
+      const ms = s.anchor ? Math.max(0, endMs - s.anchor) : 0;
+      const hours = Math.round(ms / 360000) / 10; // exact, 1 decimal
       try {
         if (hours > 0) sessionStorage.setItem('studydesk-suggest-hours', String(hours));
         else sessionStorage.removeItem('studydesk-suggest-hours');
@@ -314,6 +304,28 @@ export default function TimerPage() {
       setBusy(false);
     }
     window.location.href = '/daily';
+  };
+
+  // Busy today: session shuru nahi hua aur aaj padhai nahi hogi —
+  // Daily Log me 0 hours + busy note ki entry; aaj ke alarms bhi band (v24+).
+  const onBusyToday = async () => {
+    if (!confirm("Mark today as busy? This will save today's log with 0 hours and a busy note.")) return;
+    setBusy(true);
+    try {
+      const r = await fetch('/api/daily-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: todayISO(), hours: 0, notes: 'Busy - no study today.' }),
+      });
+      if (!r.ok) throw new Error('save failed');
+      const b = getBridge();
+      if (b && b.endSession) b.endSession(); // ended-today flag -> aaj ke alarms band
+      window.location.href = '/daily';
+    } catch {
+      alert('Could not save the busy entry. Please check your connection and try again.');
+    } finally {
+      setBusy(false);
+    }
   };
 
   const onSkip = () => {
@@ -468,8 +480,12 @@ export default function TimerPage() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="mb-1 flex h-6 items-center">
-          {active && (
+        <p className="eyebrow">Timer</p>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <h1 className="page-title flex items-center gap-2">
+            Session Timer <IconClock size={22} />
+          </h1>
+          {active ? (
             <span
               className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
                 paused
@@ -483,11 +499,16 @@ export default function TimerPage() {
               />
               {paused ? 'Paused' : 'Live'}
             </span>
+          ) : (
+            <button
+              type="button"
+              onClick={onBusyToday}
+              className="btn-ghost shrink-0 !px-3.5 !py-1.5 !text-xs"
+            >
+              Busy today
+            </button>
           )}
         </div>
-        <h1 className="page-title flex items-center gap-2">
-          Session Timer <IconClock size={22} />
-        </h1>
         <p className="page-sub">
           {active
             ? `Session started at ${fmtClock(anchor)}`
