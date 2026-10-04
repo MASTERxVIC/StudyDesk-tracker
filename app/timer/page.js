@@ -159,6 +159,48 @@ export default function TimerPage() {
   const prevSlotRef = useRef(null);
   const firstTickRef = useRef(true);
 
+  // ---- Actual study-time accumulator ----
+  // Har second: session active + not paused + current slot STUDY ho to
+  // (now - lastTick) add karo. Pause/break/skip me kuch add nahi hota,
+  // isliye Daily Log me "jitna padha utna" bharta hai, wall-clock nahi.
+  const ACCUM_KEY = 'studydesk-study-accum';
+  const accumRef = useRef(0);
+  const lastTickRef = useRef(0);
+  const anchorSeenRef = useRef(null);
+  const liveRef = useRef({ active: false, paused: false, curTitle: null });
+  const loadAccum = () => {
+    try {
+      const rawA = localStorage.getItem(ACCUM_KEY);
+      if (!rawA) return { ms: 0, anchor: null };
+      const o = JSON.parse(rawA);
+      if (o.date !== todayISO()) return { ms: 0, anchor: null };
+      return { ms: o.ms || 0, anchor: o.anchor ?? null };
+    } catch { return { ms: 0, anchor: null }; }
+  };
+  const saveAccum = () => {
+    try { localStorage.setItem(ACCUM_KEY, JSON.stringify({ date: todayISO(), ms: accumRef.current, anchor: anchorSeenRef.current })); } catch {}
+  };
+  const syncAccum = (newAnchor) => {
+    accumulate(); // gap ka hisaab (capped)
+    if (newAnchor !== anchorSeenRef.current) {
+      anchorSeenRef.current = newAnchor;
+      accumRef.current = 0;
+    }
+    saveAccum();
+    lastTickRef.current = Date.now();
+  };
+  const accumulate = () => {
+    const nowMs = Date.now();
+    const dt = nowMs - lastTickRef.current;
+    lastTickRef.current = nowMs;
+    if (dt <= 0 || dt > 120000) return; // bada gap safe side pe ignore
+    const st = liveRef.current;
+    if (st.active && !st.paused && st.curTitle && isStudySlot(st.curTitle)) {
+      accumRef.current += dt;
+      saveAccum();
+    }
+  };
+
   const refresh = useCallback(() => {
     const b = getBridge();
     if (b) {
@@ -171,6 +213,7 @@ export default function TimerPage() {
         setBaseSlots(withIcons(st.slots));
         setShifts([]); // native slots pehle se shifted aate hain
         setNow(st.now || Date.now());
+        syncAccum(st.anchor > 0 ? st.anchor : null);
         return;
       } catch {
         /* bridge toot gaya to fallback */
@@ -185,16 +228,21 @@ export default function TimerPage() {
     setBaseSlots(buildSlots(an || defaultAnchorToday()));
     setShifts(fb.shifts || []);
     setNow(Date.now());
+    syncAccum(an);
   }, []);
 
   useEffect(() => {
+    const saved = loadAccum();
+    accumRef.current = saved.ms;
+    anchorSeenRef.current = saved.anchor;
+    lastTickRef.current = Date.now();
     refresh();
     // prefetch-today: Today tab ka data bg me warm rakho taaki turant khule
     try {
       fetch('/api/daily-logs').catch(() => {});
       fetch('/api/syllabus').catch(() => {});
     } catch {}
-    const t = setInterval(() => setNow(Date.now()), 1000);
+    const t = setInterval(() => { setNow(Date.now()); accumulate(); }, 1000);
     const onVis = () => {
       if (document.visibilityState === 'visible') refresh();
     };
@@ -282,17 +330,15 @@ export default function TimerPage() {
   };
 
 
-  // End session → Daily Log page kholo; entry user khud karega (koi auto-save nahi).
-  // Timer display wala exact elapsed suggestion ke taur pe pre-filled milega, baaki sab blank.
-  const onEnd = () => {
-    if (!confirm('End today\u2019s session?')) return;
+  // Session khatm: Daily Log me ACTUAL study time pre-fill hoga
+  // (accumulator: jitna padha utna — pause/break/skip excluded). Entry user khud save karega.
+  const finishSession = (withConfirm) => {
+    if (withConfirm && !confirm('End today\u2019s session?')) return;
     setBusy(true);
     try {
-      const s = readSessionFresh();
-      const endMs = paused && s.pauseStart > 0 ? s.pauseStart : Date.now();
-      // WYSIWYG: display wala elapsed (session start se) — koi kaat-chaant nahi
-      const ms = s.anchor ? Math.max(0, endMs - s.anchor) : 0;
-      const hours = Math.round(ms / 360000) / 10; // exact, 1 decimal
+      accumulate(); // aakhri hissa pakad lo
+      // Actual study time (accumulator) — pause/break/skip excluded
+      const hours = Math.round(accumRef.current / 360000) / 10; // exact, 1 decimal
       try {
         if (hours > 0) sessionStorage.setItem('studydesk-suggest-hours', String(hours));
         else sessionStorage.removeItem('studydesk-suggest-hours');
@@ -328,19 +374,27 @@ export default function TimerPage() {
     }
   };
 
+  const onEnd = () => finishSession(true);
+
   const onSkip = () => {
     setBusy(true);
     try {
+      const nowMs = Date.now();
+      let cur = -1;
+      for (let i = 0; i < slots.length; i++) {
+        if (nowMs >= slots[i].start && nowMs < slots[i].end) { cur = i; break; }
+      }
+      // Last slot pe skip (ya saare slots ka time nikal gaya) = session end, bina confirm
+      const pastAll = slots.length > 0 && nowMs >= slots[slots.length - 1].end;
+      if (anchor && (pastAll || (cur >= 0 && cur + 1 >= slots.length))) {
+        finishSession(false);
+        return;
+      }
       const b = getBridge();
       if (b) {
         if (b.skipToNext) b.skipToNext(); // purane APK me method nahi hoga → kuch nahi
       } else if (anchor) {
-        // Desktop fallback: wahi anchor-shift math
-        const nowMs = Date.now();
-        let cur = -1;
-        for (let i = 0; i < slots.length; i++) {
-          if (nowMs >= slots[i].start && nowMs < slots[i].end) { cur = i; break; }
-        }
+        // Desktop fallback: wahi anchor-shift math (cur upar compute ho chuka)
         if (cur >= 0 && cur + 1 < slots.length) {
           let newAnchor = nowMs;
           for (let i = 0; i <= cur; i++) newAnchor -= slots[i].end - slots[i].start;
@@ -407,6 +461,7 @@ export default function TimerPage() {
   const next = active ? slots.find((s) => s.start > effNow) : null;
   const curTitle = current ? current.title : null;
   const curIdx = current ? slots.findIndex((s) => s === current) : -1;
+  liveRef.current = { active, paused, curTitle };
 
   // Topic popup: ek subject me din me sirf ek baar (save ho ya dismiss, dobara nahi)
   const topicAskedKey = () => `topic-asked-${todayISO()}`;
