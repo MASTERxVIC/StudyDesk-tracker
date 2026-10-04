@@ -12,6 +12,10 @@
 }
 
 @layer components {
+  /* Edge-to-edge: status icons ke liye safe-area top padding */
+  .mobilebar-safe {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 1rem);
+  }
   .card {
     @apply rounded-3xl border border-blush-200/70 bg-white p-5 shadow-[0_2px_16px_rgba(27,155,216,0.09)] dark:border-white/10 dark:bg-[#12263c] dark:shadow-none;
   }

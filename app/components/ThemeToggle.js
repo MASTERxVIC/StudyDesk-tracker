@@ -19,6 +19,7 @@ export default function ThemeToggle({ compact = false }) {
     setDark(next);
     document.documentElement.classList.toggle('dark', next);
     localStorage.setItem('bank-tracker-theme', next ? 'dark' : 'light');
+    try { if (window.StudyDesk && window.StudyDesk.syncStatusBar) window.StudyDesk.syncStatusBar(); } catch {}
   };
 
   return (

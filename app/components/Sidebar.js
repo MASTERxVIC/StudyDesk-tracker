@@ -207,7 +207,7 @@ export function Sidebar() {
 export function MobileBar() {
   return (
     <div className="sticky top-0 z-40 border-b border-blush-200/70 bg-blush-50/90 backdrop-blur-md dark:border-white/10 dark:bg-[#0e1e30]/90 lg:hidden">
-      <div className="flex items-center justify-between px-4 pt-4">
+      <div className="flex items-center justify-between px-4 mobilebar-safe">
         <div className="flex items-center gap-2.5">
           <Logo size={30} />
           <p className="font-display text-lg leading-none text-ink dark:text-[#e8f2fa]">Study Desk</p>
