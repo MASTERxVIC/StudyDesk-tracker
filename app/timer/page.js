@@ -690,11 +690,29 @@ export default function TimerPage() {
             Today&apos;s timetable
           </p>
           <div className="space-y-1.5">
-            {slots.map((s, i) => {
+            {slots.filter((s) => !isBreakSlot(s.title)).map((s, i) => {
               const isCur = active && effNow >= s.start && effNow < s.end;
               const isPast = effNow >= s.end;
               const SIcon = s.Icon || IconClock;
               const topic = topicFor(s.title);
+              // Session complete: sirf centered text, time nahi
+              if (s.end <= s.start) {
+                return (
+                  <div
+                    key={i}
+                    className={`flex items-center justify-center rounded-xl px-3 py-2 text-sm ${
+                      isPast
+                        ? 'text-neutral-400 dark:text-neutral-600'
+                        : 'text-neutral-600 dark:text-neutral-300'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <SIcon size={17} />
+                      {s.title}
+                    </span>
+                  </div>
+                );
+              }
               return (
                 <div
                   key={i}
