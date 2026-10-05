@@ -424,7 +424,17 @@ export default function TimerPage() {
     if (t.includes('revision')) return 'Revision';
     return title;
   };
-  const isStudySlot = (title) => slotKey(title) !== title;
+  const isStudySlot = (title) => {
+    const t = (title || '').toLowerCase();
+    return (
+      t.includes('quant') ||
+      t.includes('reasoning') ||
+      t.includes('english') ||
+      t.includes('revision') ||
+      t.includes('ga') ||
+      t.includes('current affairs')
+    );
+  };
   const isBreakSlot = (title) => {
     const t = (title || '').toLowerCase();
     return t.includes('break') || t.includes('lunch');
