@@ -182,10 +182,12 @@ export default function TimerPage() {
   };
   const syncAccum = (newAnchor) => {
     accumulate(); // gap ka hisaab (capped)
-    if (newAnchor !== anchorSeenRef.current) {
-      anchorSeenRef.current = newAnchor;
+    // Reset SIRF naye session pe (anchor null -> set). Skip me anchor badalta hai
+    // lekin padhai ka hisaab bana rehna chahiye — isliye skip pe reset nahi.
+    if (anchorSeenRef.current == null && newAnchor != null) {
       accumRef.current = 0;
     }
+    anchorSeenRef.current = newAnchor;
     saveAccum();
     lastTickRef.current = Date.now();
   };
@@ -392,7 +394,11 @@ export default function TimerPage() {
       }
       const b = getBridge();
       if (b) {
-        if (b.skipToNext) b.skipToNext(); // purane APK me method nahi hoga → kuch nahi
+        // skipToNext true = native ne session end kiya (last slot defensive) ->
+        // web finish flow chalao: actual-study prefill + /daily kholo
+        let nativeEnded = false;
+        try { nativeEnded = !!(b.skipToNext && b.skipToNext()); } catch { nativeEnded = false; }
+        if (nativeEnded) { finishSession(false); return; }
       } else if (anchor) {
         // Desktop fallback: wahi anchor-shift math (cur upar compute ho chuka)
         if (cur >= 0 && cur + 1 < slots.length) {
