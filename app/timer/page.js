@@ -157,7 +157,6 @@ export default function TimerPage() {
   const [topicDlg, setTopicDlg] = useState(null); // { slot, value }
   const [breakDlg, setBreakDlg] = useState(false);
   const prevSlotRef = useRef(null);
-  const firstTickRef = useRef(true);
 
   // ---- Actual study-time accumulator ----
   // Har second: session active + not paused + current slot STUDY ho to
@@ -505,13 +504,9 @@ export default function TimerPage() {
       localStorage.setItem(breakAskedKey(), JSON.stringify(all));
     } catch {}
   };
-  // Slot badalte hi popup: study slot → topic puchho, break/lunch → avail ya skip
+  // Slot badalte hi popup: study slot → topic puchho, break/lunch → avail ya skip.
+  // Pehle slot (session start) pe bhi puchho — "kya padh rhe ho" sabse zaroori wahin hai.
   useEffect(() => {
-    if (firstTickRef.current) {
-      firstTickRef.current = false;
-      prevSlotRef.current = curTitle;
-      return;
-    }
     const prev = prevSlotRef.current;
     prevSlotRef.current = curTitle;
     if (!curTitle || curTitle === prev || paused) return;
