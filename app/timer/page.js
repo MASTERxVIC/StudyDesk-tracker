@@ -341,8 +341,8 @@ export default function TimerPage() {
       // Actual study time (accumulator) — pause/break/skip excluded
       const hours = Math.round(accumRef.current / 360000) / 10; // exact, 1 decimal
       try {
-        if (hours > 0) sessionStorage.setItem('studydesk-suggest-hours', String(hours));
-        else sessionStorage.removeItem('studydesk-suggest-hours');
+        // 3 min se kam padhai ho to bhi 0 prefill karo (blank nahi)
+        sessionStorage.setItem('studydesk-suggest-hours', String(hours));
       } catch { /* ignore */ }
       const b = getBridge();
       if (b) b.endSession();

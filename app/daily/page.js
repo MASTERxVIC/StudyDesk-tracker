@@ -220,7 +220,7 @@ export default function DailyLogPage() {
             <label className="label">Study hours</label>
             <input
               type="number" min="0" step="0.1" name="hours" value={form.hours}
-              onChange={onChange} className="input" placeholder="e.g. 6.5"
+              onChange={onChange} className="input" placeholder="2.3"
             />
           </div>
         </div>
